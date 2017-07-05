@@ -1,4 +1,4 @@
-function model = dipsCoordDescent(data, options, lambda1) % separate lambda1 for parfor
+function model = dipsCoordDescent(data, options) % separate lambda1 for parfor
 
 %------------------------------------------------------------------------%
 % Minimize the following objective function using coordinate descent
@@ -17,7 +17,6 @@ function model = dipsCoordDescent(data, options, lambda1) % separate lambda1 for
 %           .nFeaUpd: 		number of features to be randomly updated 
 %           (if nFeaUpd < 1, then it is percentage)
 %------------------------------------------------------------------------%
-
 
 
 
@@ -139,6 +138,9 @@ function model = dipsCoordDescent(data, options, lambda1) % separate lambda1 for
 	end
 
 
+
+
+
 	% - - - - - - - - - - - - - OUTPUT - - - - - - - - - - - - - - - - - 
 
 	u_log(:,iter:end) = [];
@@ -148,27 +150,6 @@ function model = dipsCoordDescent(data, options, lambda1) % separate lambda1 for
 	model.u = u;
 	model.u_log = u_log;
 
+
+
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

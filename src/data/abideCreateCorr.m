@@ -33,10 +33,10 @@ function abideCreateCorr(opt)
 	data = load1D(dir_ts);
 
 	% create output directorty
-	mkdir(dir_output);
-	mkdir([dir_output,'/',dir_prefix]);
-	mkdir([dir_output,'/',dir_prefix,'/mat']);
-	mkdir([dir_output,'/',dir_prefix,'/csv']);
+	mkdir_if_not_exist(dir_output);
+	mkdir_if_not_exist([dir_output,'/',dir_prefix]);
+	mkdir_if_not_exist([dir_output,'/',dir_prefix,'/mat']);
+	mkdir_if_not_exist([dir_output,'/',dir_prefix,'/csv']);
 
 	% For each session, compute Pearson's correlation:
 	fnum = length(data);

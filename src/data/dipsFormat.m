@@ -37,8 +37,8 @@ function data = dipsFormat(opt)
 	end
 
 	% add label to each snapshot
-	opt = []; 
 	opt.meta_dir = [corr_dir,'/../pheno'];
+	mkdir_if_not_exist(opt.meta_dir)
 	data.gnd = loadPheno(data.id, 8, opt)';
 
 	% add network adjacent matrix

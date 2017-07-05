@@ -1,8 +1,8 @@
 function model = dipsLE(data,options,varargin)
 %------------------------------------------------------------------------%
-%-- Supervised Laplacian Embedding techniques, both linear and non-linear projections 
-%-- Non-linear: Max y'(Lb + Aw)y s.t. y'Dwy=1  
-%-- Linear:     a'X(Lb + Aw)X'a s.t. a'XDwX'a=1  (might add a'Ca as network topo constraint)
+%-- Laplacian Embedding, both linear and non-linear projections 
+%-- Non-linear: Max u'*L*u s.t. y'*Dp*y=1  
+%-- Linear:     v'*X'*L*X*v s.t. v'*X'*Dp*X*v=1  (may add v'*C*v as network topo constraint)
 % 
 %-- Note: Different sizes of eigVecs y (1*nSmp) and a (1*nFea)
 %     Non-linear: entries in y are mapping points
@@ -13,219 +13,197 @@ function model = dipsLE(data,options,varargin)
 % seek y s.t. MAX y'(Lb+Aw)y s.t. y'Dwy=1 or equivalently
 %               z'(Dw^{-.5}(Lb+Aw)Dw^{-.5})z = z'Lz s.t. z'z=1
 %  view L=XX' and decompose X=USV', similar to sparsePCA
-%  find sparse a s.t. min ||Xa -y ||^2  + \alpha a'Ca + \beta |a|
+%  find sparse a s.t. min ||Xa -y ||^2  + \lambda2 a'Ca + \lambda1 |a|
 %  where y' = \sigma*v' by svd
 
 % Input:
 %     + data: struct data type
-%           .X [nSmp nFea]:   dataset X
-%           .gnd [1 nSmp]: global network states
-%           .gndFea [1 nSmp]: global network states
-%           .W [nFea nFea]:topology sharing among samples
+%           .X [nSmp nFea]:     dataset X
+%           .gnd [nSmp 1]:      global network states or labels
+%           .W [nFea nFea]:     topology sharing among samples
 %                 Wij is the frequency of edge ij in all networks
 %     + options: structure
 %           .bLinear: =1 for linear case
-%           .k:     number of nearest neighbors,    def.=5
-%           .alpha: tradeoff (alpha*Lb + (1-alpha)*Aw), def.=.5
-%           .lambda2: L2 tradeoff for smoothness topology, def.=0.1
-%           .dDim:  projected subspace dimension def.= nClass-1
+%           .k:     number of nearest neighbors, def.=10
+%           .beta:  similarity tradeoff (beta*Lb + (1-beta)*Aw), def.=.5
+%           .d:     projected subspace dimension, def.= nClass-1
 % Output:
 %     + model: struct data type
-%           .eVecs: either y or a above. 
-%           .eVals: either y or a above. 
-%           .Y: samples presented in projected subspace (=y in non-linear,
-%           = a'X in linear)
-%           .Lb = Db-Ab
-%           .Aw 
-%           .Dw 
+%           .eVecs:             either y or a above. 
+%           .eVals:             either y or a above. 
+%           .Y [nSmp d]:        samples presented in projected subspace
+%           .Dp
+%           .L
 %------------------------------------------------------------------------%
 
+    %-- beta: affects L1 selection,
+    %       better for small beta ~ more emphasis on Aw
+    %       if balanced beta, kNN should be large, say 40
+    % beta=0.5; %-- Aw is much more important than Lb
+
+
+
+% - - - - - - - - - - - - - IMPORT PARAMETERS - - - - - - - - - - - - - - - - - 
+
+    % number of classes
+    Class  = unique(data.gnd);
+    nClass = length(Class);
+
+    % # features, # samples
+    [nSmp, nFea] = size(data.X);
+
+    % check existence of parameter options
+    if (~exist('options','var'))
+        options = [];
+    end
+
+    % k: number of nearest neighbors, def.=10
+    k = 10;
+    if isfield(options,'k'),
+        k = options.k;
+    end
+
+    % bLinear: =1 for linear case
+    bLinear = 1;
+    if isfield(options,'bLinear'),
+        bLinear = options.bLinear;
+    end
+
+    % beta: similarity tradeoff (beta*Lb + (1-beta)*Aw), def.=.5
+    beta = 0.5;
+    if isfield(options,'beta'),
+        beta = options.beta;
+    end
+
+    % d: projected subspace dimension, def.= nClass-1
+    d=nClass-1;
+    if isfield(options,'d'),
+        d = options.d;
+    end
 
 
 
 
-% - - - - - - - - - - - - - IMPORT - - - - - - - - - - - - - - - - - 
+% - - - - - - - - - - - - - DO WORK - - - - - - - - - - - - - - - - - - - - - 
 
-tic
+    % - - - - - - - - - STEP 1: COMPUTE SIMILARITY MATRIX (Kp Kn) - - - - - -
 
-Class  = unique(data.gnd);
-nClass = length(Class);
+    %-- use Euclidean or Pearson for expression profiles
+    opt = [];
+    opt.type='Eucl';
+    % opt.type='Cosine';
+    if isfield(options,'A')
+        A = options.A;
+    else
+        A = pwDist(data.X',data.X',opt);
+    end
+    
+    % -- generate KNN binary mask
+    [dmp idx] = sort(A,2,'descend'); % -- sort each row in a descend order
+    idx(:,[1,k+2:end]) = []; % -- remove 1st (selfnode sim) + last smallest sim
+    kNN = zeros(size(A));
+    for i = 1:nSmp
+        kNN(i,idx(i,:)) = 1;
+    end
 
-[nFea,nSmp] = size(data.X);
-
-if (~exist('options','var'))
-    options = [];
-end
-
-k = 10;
-if isfield(options,'k'),
-    k = options.k;
-end
-
-bLinear = 1;
-if isfield(options,'bLinear'),
-    bLinear = options.bLinear;
-end
-
-
-alpha = 0.5;
-if isfield(options,'alpha'),
-    alpha = options.alpha;
-end
-
-lambda2 = 0.1;
-if isfield(options,'lambda2'),
-    lambda2 = options.lambda2;
-end
-
-dDim=nClass-1;
-if isfield(options,'dDim'),
-    dDim = options.dDim;
-end
+    A = A.*kNN;
+    A = max(A,A'); % -- (attention to corr/cosine similarity)
 
 
+    %-- build 2 meta masks: p(intra-class) and n(inter-class) 
+    Ap = zeros(nSmp,nSmp);
+    Ap = sparse(Ap);
+    for i = 1 : nClass
+        classIdx = find(data.gnd==Class(i));
+        Ap(classIdx,classIdx) = 1;
+    end
+    An = ones(nSmp,nSmp)-Ap;
+
+    %-- apply the mask
+    Ap = Ap.*A;
+    An = An.*A;
+    Ap = max(Ap,Ap');
+    An = max(An,An');
+
+    % figure;imshow(full(A),'InitialMagnification',2000);
 
 
+    % - - - - - - - - - STEP 2: COMPUTE LAPLACIAN (Lp Ln) - - - - - -
+
+    % compute Laplacian Lp of intra-class similarity
+    Dp = diag(sum(Ap,2));
+    if (length(find(Dp==0))>0),
+        error('Increase kNN to ensure no disconnected same-class nodes!');
+    end
+    Lp = Dp - Ap; 
+    clear Ap; % - - hold Dp
+
+    % compute Laplacian Ln of inter-class similarity
+    Dn = diag(sum(An,2));
+    Ln = Dn - An; 
+    clear An Dn;
+
+    % jointly model inter-class and intra-class similarity
+    L = Ln - beta * Lp;
+    % L = beta*Ln + (1-beta)*Lp;    % alternative formulation
+
+    % linear case (slower): max a'X(Lb+Aw)X'a s.t. a'XDX'a=1
+    if bLinear 
+       L = data.X'*L*data.X;
+       Dp = data.X'*Dp*data.X;
+    end
+ 
 
 
-model.alpha = alpha;
-model.k = k;
+    % - - - - - - - - - STEP 3: SOLVE OPTIMIZATION PROBLEM - - - - - -
 
-%-- use Euclidean for kNN similarity (or Pearson for expression profiles)\
-opt = [];
-opt.type='Eucl';
-% opt.type='Cosine';
-[A] = PWdistance(data.X,data.X,opt);
-[dmp idx] = sort(A,2,'descend'); 
+    % %-- pseudo inv is worse than using eig
+    % [U,S,V]=SVD_CutOff(Dw,.99);
+    % invD = V*inv(S)*U';
+    % invD = max(invD,invD');
+    % [eVecs, eVals] = eigs(invD*L,d); 
+    % diag(eVals)
+    % Dw*invD
 
-idx(:,[1,k+2:end]) = []; %-- remove 1st (selfnode sim) + last smallest sim
-kNN = zeros(size(A));
-for i = 1 : nSmp
-    kNN(i,idx(i,:)) = 1;
-end
-
-A = A.*kNN;
-A = max(A,A'); %-- (attention to corr/cosine similarity)
+    % %-- better for singular Dw, check algo behind eig and eigs
+    % [eVecs, eVals] = eig(L, Dw); % diag(eVals) % work well for non-linear but
+    % show for linear case on Brain data
 
 
-
-%-- build 2 meta-graphs: ML(within) and CL(between) Affinity Matrices
-
-Aw = zeros(nSmp,nSmp);
-Aw = sparse(Aw);
-for i = 1 : nClass
-    classIdx = find(data.gnd==Class(i));
-    Aw(classIdx,classIdx) = 1;
-end
-Ab = ones(nSmp,nSmp)-Aw;
-
-%-- Aw and Ab
-Aw = Aw.*A;
-Ab = Ab.*A;
-Aw = max(Aw,Aw');
-Ab = max(Ab,Ab');
-
-% figure;imshow(full(A),'InitialMagnification',2000);
-
-
-%-- Compute Lb= Db-Ab
-Db = full(sum(Ab,2));
-Lb = -Ab; %clear Ab
-for k = 1:size(Lb,1)
-    Lb(k,k) = Db(k) + Lb(k,k) ;
-end
-clear Db
-
-%-- Compute Lw= Dw-Aw
-Dw = full(sum(Aw,2));
-if (length(find(Dw==0))>0),
-    error('Increase kNN to ensure no disconnected "within" nodes!');
-end
-
-Lw = -Aw; %clear Aw
-for k = 1 : size(Lw,1)
-    Lw(k,k) = Dw(k) + Lw(k,k);
-end
-Dw = diag(Dw);
-
-
-% %-- construct graph-constrainted Laplacian C=Lc=Dc-Wc
-% Wc = max(data.W,data.W');
-% Dc = full(sum(Wc,2));
-% C = -Wc; clear Wc
-% for k = 1 : size(C,1)
-%     C(k,k) = Dc(k) + C(k,k);
-% end
-%
-% clear Dc
-
-%-- MAX y'(Lb+Aw)y s.t. y'Dwy=1 or z'Lz s.t. z'z=1 with z=Dw^{-.5}y
-%-- alpha: affects L1 selection,
-%       better for small alpha ~ more emphasis on Aw
-%       if balanced alpha, kNN should be large, say 40
-% alpha=0.1;
-% L=(alpha*Lb + (1-alpha)*Aw); %-- L=(Lb - Lw);  %-- returns same result
-% L = max(L,L');
-% diag(L)
-
-% alpha=0.5; %-- Aw is much more important than Lb
-% if bLinear %-- linear case: max a'X(Lb+Aw)X'a s.t. a'XDX'a=1
-%    L = data.X*(alpha*Lb + (1-alpha)*Aw)*data.X';
-%    Dw = data.X*Dw*data.X';
-% else       %-- non-linear case: max a'(Lb+Aw)a s.t. a'Da=1
-%     L = alpha*Lb + (1-alpha)*Aw;
-% end
+    [eVecs, eVals] = eig(L, Dw);
+    eVals(isnan(eVals)) = 0;
+    [eVals, ind] = sort(diag(eVals), 'descend');
+    eVecs = eVecs(:,ind(1:min([d size(eVecs, 2)])));
+      
 
 
 
-L = alpha*Lb + (1-alpha)*Aw;
-% L = Lb + alpha*Aw;
-
-% linear case (slower): max a'X(Lb+Aw)X'a s.t. a'XDX'a=1
-if bLinear 
-   L = data.X*L*data.X';
-   Dw = data.X*Dw*data.X';
-end
 
 
 
-% %-- pseudo inv is worse than using eig
-% [U,S,V]=SVD_CutOff(Dw,.99);
-% invD = V*inv(S)*U';
-% invD = max(invD,invD');
-% [eVecs, eVals] = eigs(invD*L,dDim); 
-% diag(eVals)
-% Dw*invD
 
-% %-- better for singular Dw, check algo behind eig and eigs
-% [eVecs, eVals] = eig(L, Dw); % diag(eVals) % work well for non-linear but
-% show for linear case on Brain data
+% - - - - - - - - - ENCAPSULATION - - - - - - - - - - - - - - - - - -
 
+    model.beta = beta;
+    model.k = k;
 
+    model.L = L;
+    model.Dp = sparse(Dp);
 
-[eVecs, eVals] = eig(L, Dw);
-eVals(isnan(eVals)) = 0;
-[eVals, ind] = sort(diag(eVals), 'descend');
-eVecs = eVecs(:,ind(1:min([dDim size(eVecs, 2)])));
-  
+    model.eVecs = eVecs;
+    model.eVals = eVals;
 
+    if bLinear 
+        model.Y = data.X * eVecs ;
+    else       
+        model.Y = eVecs;
+    end
 
-model.eVecs = eVecs;
-model.eVals = eVals;
-if bLinear 
-    model.Y = eVecs'*data.X;
-else       
-    model.Y = eVecs';
-end
-model.Lb = Lb;
-model.Aw = Aw;
+    
 
-model.B = L;
-model.W = Dw;
-
-% figure;
-%     subplot(1,3,1); PlotX(data.X,data.gnd,'','Original space',''); grid on;
-%     subplot(1,3,2); PlotX(model.Y,data.gnd,'','Embedded space','');
-%     subplot(1,3,3); stem(abs(model.eVecs(:,1)));
+    % figure;
+    %     subplot(1,3,1); PlotX(data.X,data.gnd,'','Original space',''); grid on;
+    %     subplot(1,3,2); PlotX(model.Y,data.gnd,'','Embedded space','');
+    %     subplot(1,3,3); stem(abs(model.eVecs(:,1)));
 
 end
