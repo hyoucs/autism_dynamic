@@ -59,13 +59,16 @@ function [PWdist] = pwDist(X,Y,opt)
         case 'Eucl'
             for j=1:nSmp2
                 PWdist(j,:) = sqrt(sum((Y(:,j)*ones(1,nSmp1)-X).^2));
+                if mod(j,10) == 0
+                    fprintf('Pairwise Dist: %d in %d\n',j,nSmp2);
+                end
             end
         case 'Gauss'
             E = zeros(nSmp2,nSmp1); 
             for j=1:nSmp2
                 E(j,:)=sum((Y(:,j)*ones(1,nSmp1)-X).^2);
             end
-            if isfield(opt,'sigma') & (opt.sigma> 0)
+            if isfield(opt,'sigma') && (opt.sigma> 0)
                 sigma=opt.sigma;
             else %-- compute kernel width from data
                 %-- C1
@@ -83,14 +86,9 @@ function [PWdist] = pwDist(X,Y,opt)
             for j=1:nSmp2
                 PWdist (j,:)=corr(Y(:,j),X);
             end
-        end
-            
     end
-
-
-               
+            
 end
-
 
 
 function Y = unitLen(X)

@@ -1,5 +1,5 @@
 function [m] = dipsFold(data,opt,idxFold)
-%------------------------------------------------------------------------%
+%------------------------------------------------------------------------
 % Learning discriminant subnetwork from supervised network data
 % 2 steps:
 %       (1) (nonlinear) supervisedLE;
@@ -14,6 +14,7 @@ function [m] = dipsFold(data,opt,idxFold)
 %           .lambda1s [1 n]:    set of lambda1
 %           .Y [nSmp mFea]:     X in embedding space
 %                               (if not provided, compute via supervisedLE)
+%           .A [nSmp nSmp]:     pairwise similarity (among samples)
 %     + opt: structure
 %           .bLinear:           linear or non-linear LE (default 0-nonlinear)
 %           .alpha:             tradeoff btw Lb and Aw
@@ -29,7 +30,7 @@ function [m] = dipsFold(data,opt,idxFold)
 %           .Z:                 X in transformed space
 %           .theta:             coeff to form each dim of transformed space
 %           .predictedLabel:    labels predicted by SVM on all nFold testdata
-%------------------------------------------------------------------------%
+%------------------------------------------------------------------------
 
 
 
@@ -86,19 +87,19 @@ function [m] = dipsFold(data,opt,idxFold)
     trainData = data;
     % if idxFold (3rd parameter of this function) is provided, 
     % then perform training and testing on a single fold indicated by idxFold.
-    if (nargin==3), 
-        nFold = 1;
-        trainIdx = (trainData.testSet ~= idxFold);
-        trainData.X = trainData.X(trainIdx,:);
-        trainData.gnd = trainData.gnd(trainIdx,1);
-        if isfield(trainData,'Y')
-            trainData.Y = data.Y(trainIdx,:);
-        end
+    trainIdx = (trainData.testSet ~= idxFold);
+    trainData.X = trainData.X(trainIdx,:);
+    trainData.gnd = trainData.gnd(trainIdx,1);
+    if isfield(trainData,'Y')
+        trainData.Y = data.Y(trainIdx,:);
     end
     % normalized all features
     trainData.X = Xnorm(trainData.X')';
     [nSmp, nFea] = size(trainData.X);
     data.X = Xnorm(data.X')';
+
+    % - - - - - - Prepare truncated pairwise similarity matrix
+    trainData.A = data.A(trainIdx, trainIdx);
 
 
 
@@ -316,7 +317,7 @@ function smodel = accuracyKmeans(data, iFold)
 
     % split dataset to test and train data
     testIdx = (data.testSet == iFold);
-    testData.X = data.X(testIdx.:);
+    testData.X = data.X(testIdx,:);
     testData.gnd = data.gnd(testIdx,1);
 
     % classifiy test samples
