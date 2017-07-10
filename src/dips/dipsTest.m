@@ -34,9 +34,10 @@ opt.lambda2s = [0.1];
 
 opt.bLinear = 0; 
 opt.alpha = .2; 
-opt.k = 50;
+opt.k = 20;
 opt.nFeaUpd = .8; 
 opt.verbose = 1;
+opt.d = 2;
 
 tStart = tic; 
 m = dipsFold(data, opt, 1); 

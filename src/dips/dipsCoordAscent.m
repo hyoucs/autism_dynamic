@@ -1,4 +1,4 @@
-function model = dipsCoordDescent(data, options) % separate lambda1 for parfor
+function model = dipsCoordAscent(data, options) % separate lambda1 for parfor
 
 %------------------------------------------------------------------------%
 % Minimize the following objective function using coordinate descent
@@ -33,13 +33,13 @@ function model = dipsCoordDescent(data, options) % separate lambda1 for parfor
 
 	% import parameter for l1 penalty
 	lambda1 = 0.1;
-	if isfield(options,'lambda1'),
+	if isfield(options,'lambda1')
 	    lambda1 = options.lambda1;
 	end
 
 	% import number of features to be updated randomly at each iteration
 	nFeaUpd = nFea;
-	if isfield(options,'nFeaUpd'),
+	if isfield(options,'nFeaUpd')
 	    if options.nFeaUpd <=1
 	        % percentage of no. of features
 	        nFeaUpd = floor(options.nFeaUpd*nFea);
@@ -51,12 +51,12 @@ function model = dipsCoordDescent(data, options) % separate lambda1 for parfor
 
 	% import parameter for quadratic penalty
 	lambda2 = 0.1;
-	if isfield(options,'lambda2'),
+	if isfield(options,'lambda2')
 	    lambda2 = options.lambda2;
 	end
 
 	% import initial point in optimization
-	if isfield(options,'u'),
+	if isfield(options,'u')
 	    u = options.u; 
 	else
 	    u = (X'*X + 0.01*eye(nFea))\(X'*y); % ridge
@@ -65,7 +65,7 @@ function model = dipsCoordDescent(data, options) % separate lambda1 for parfor
 
 	% import flag for printing
 	verbose = 0;
-	if isfield(options,'verbose'),
+	if isfield(options,'verbose')
 	    verbose = options.verbose; 
 	end
 	if verbose       %Start the log
@@ -113,7 +113,7 @@ function model = dipsCoordDescent(data, options) % separate lambda1 for parfor
 		rndIdx = randperm(nFea, nFeaUpd);
 		for k = 1:nFeaUpd
 			t = rndIdx(k);
-			a1 = 2 * (VVt(t) + lambda2 * C(t,t));
+			a1 = 2 * (VVt(t,t) + lambda2 * C(t,t));
 			a2 = 2 * (Vy(t) - VVt(t,:)*u + VVt(t,t)*u(t)) -...
 				 2 * lambda2 * (C(t,:) * u - C(t,t) * u(t));
 			% update u(t)

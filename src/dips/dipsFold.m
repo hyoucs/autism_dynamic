@@ -41,12 +41,12 @@ function [m] = dipsFold(data,opt,idxFold)
     % - - - - - - - - - - - - - IMPORT PARAMETERS - - - - - - - - - - - - - - - - - 
 
     verbose=0;
-    if isfield(opt,'verbose'),
+    if isfield(opt,'verbose')
         verbose= opt.verbose;
     end
 
 
-    if isfield(opt,'lambda1s'),
+    if isfield(opt,'lambda1s')
         lambda1s = opt.lambda1s;
     else
         lambda1s = [logspace(2.5, 0, 4) 0];
@@ -54,7 +54,7 @@ function [m] = dipsFold(data,opt,idxFold)
     end
 
 
-    if isfield(opt,'lambda2s'),
+    if isfield(opt,'lambda2s')
         lambda2s = opt.lambda2s;
     else
         lambda2s = sort([logspace(.5, 0, 3) .5 .01],'ascend');
@@ -115,15 +115,15 @@ function [m] = dipsFold(data,opt,idxFold)
         Y = trainData.Y;
     else    
         % embedding space Y is not provided, find it by dipsLE.m
-        sModel = dipsLE(trainData,opt);
-        Y = sModel.Y';
+        sModel = dipsLE(trainData, opt);
+        Y = sModel.Y;
         % save embedding space information to structure
         m.Y = Y;
         m.eVecs = sModel.eVecs;
         m.eVals = sModel.eVals;
     end
     % visualProj(Y, trainData.gnd, ['trainData Fold #', num2str(idxFold)]);
-    [d nSmp] = size(Y);
+    [nSmp, d] = size(Y);
 
     % if svm is suppressed, then will use kmeans instead of linear svm
     % the center of each class should be computed once you get Y in the
@@ -417,6 +417,6 @@ function m = accuracySVM(data, idxFold)
     
     end
     
-    m.predictedLabel = [m.predictedLabel data.gnd data.testSet];
+    m.predictedLabel = [m.predictedLabel' data.gnd data.testSet];
 
 end
