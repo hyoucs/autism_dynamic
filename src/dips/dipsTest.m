@@ -26,10 +26,11 @@ else
 end
 clear pw;
 
-opt.lambda1s = [logspace(2.5, 0, 9) 0]/1000;
-opt.lambda2s = [0 0.1 0.5 1 2];
+% opt.lambda1s = [logspace(2.5, 0, 9) 0]/1000;
+opt.lambda2s = [0 0.1 0.5 1 5 10];
 
-% opt.lambda1s = [0.15];
+% lambda1 = 0.075 still too large
+opt.lambda1s = [0.01];
 % opt.lambda2s = [0.1];
 
 opt.bLinear = 0; 
