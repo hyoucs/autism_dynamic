@@ -175,13 +175,11 @@ function [m] = dipsFold(data,opt,idxFold)
 
             % regress each dim of embedded data Y,
             % call dipsCoordAscent
-            tic;
             for iFea = 1:d
                 trainData.y = Y(:, iFea);
                 regModel = dipsCoordAscent(trainData, opt);
                 U(:,iFea) = regModel.u;
             end
-            toc;
 
             % count non-zero features for all dimensions
             cntFea = sum((U(:,:)~=0));

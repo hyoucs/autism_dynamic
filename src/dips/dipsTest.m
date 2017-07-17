@@ -33,7 +33,7 @@ clear pw;
 opt.lambda2s = [0];
 
 % lambda1 = 0.075 still too large
-opt.lambda1s = [.1,.05,.001];
+opt.lambda1s = [.1:.01:.2];
 % opt.lambda2s = [0.1];
 
 opt.bLinear = 0; 
