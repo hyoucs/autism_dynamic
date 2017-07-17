@@ -39,5 +39,5 @@
     abideCreateCorr(opt);
 
     % transform to DIPS input format
-    opt.corr_dir = '../../../autism_private/data/correlation/cc200-fg-wcorr-WL20TR-pc/mat';
+    opt.corr_dir = ['../../../autism_private/data/correlation/',opt.dir_prefix,'/mat'];
     data = dipsFormat(opt);

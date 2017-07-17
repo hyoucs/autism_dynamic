@@ -5,7 +5,7 @@ function data = dipsFormat(opt)
 	if isfield(opt, 'corr_dir')
 		corr_dir = opt.corr_dir;
 	else
-		corr_dir = '../../../autism_private/data/correlation/cc200-fg-wcorr-WL10TR-pc/mat';
+		err('... please provide the directory of correlation matrices ...');
 	end
 	fstruct = dir([corr_dir, '/*.mat']);
 	snap_num = length(fstruct);
@@ -21,8 +21,10 @@ function data = dipsFormat(opt)
 	data.label	= zeros(snap_num, 1);
 	data.site 	= cell(1, snap_num);
 	data.id		= cell(1, snap_num);
-	data.init	= zeros(snap_num, 1);
-	data.end 	= zeros(snap_num, 1);
+	if isfield(opt, 'WL')
+		data.init	= zeros(snap_num, 1);
+		data.end 	= zeros(snap_num, 1);
+	end
 
 	% transform matrices to feature vectors
 	for i = 1:snap_num
@@ -32,11 +34,13 @@ function data = dipsFormat(opt)
 	    data.X(i,:) 	= mat2vec(frame.mat)';
 	    data.site{i}	= frame.site;
 		data.id{i}		= frame.id;
-		data.init(i,1)	= frame.init;
-		data.end(i,1) 	= frame.end;
+		if isfield(opt, 'WL')
+			data.init(i,1)	= frame.init;
+			data.end(i,1) 	= frame.end;
+		end
 	end
 
-	% add label to each snapshot
+	% add label to each functional correlation matrix
 	opt.meta_dir = [corr_dir,'/../pheno'];
 	mkdir_if_not_exist(opt.meta_dir)
 	data.gnd = loadPheno(data.id, 8, opt)';
