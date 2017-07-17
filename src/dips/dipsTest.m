@@ -1,6 +1,7 @@
 function dipsTest(in_file)
 
 	%% -- DISM with brain data
+	in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
 	% in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-WL10TR-pc/dips_data.mat';
 	load(in_file);
 
