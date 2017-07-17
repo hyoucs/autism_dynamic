@@ -1,0 +1,5 @@
+{Undefined function or variable 'crossvalind'.
+} 
+{Error using dipsFold (line 80)
+This function requires cross validation indexing!
+} 

@@ -10,10 +10,10 @@
 		nFold = 10;
 		data.testSet = crossvalind('Kfold', size(data.X,1), nFold);
 		save(in_file,'data');
-	    disp('New TestSet Generated');
+	    disp('... New TestSet Generated ...');
 	end
 
-	% generate pairwise distance matrix
+	disp('... generate pairwise distance matrix ...');
 	opt = [];
 	opt.type = 'Eucl';
 	[pathstr,name,ext] = fileparts(in_file);
@@ -30,7 +30,7 @@
 
 
 
-
+	disp('... run dips for cv folds ...');
 	% opt.lambda1s = [1, 0.75, 0.5, logspace(2.5, 0, 9) 0]/1000;
 	opt.lambda2s = [0];
 
