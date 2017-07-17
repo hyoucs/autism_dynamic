@@ -1,7 +1,7 @@
-function dipsTest(in_file)
+% function dipsTest(in_file)
 
 	%% -- DISM with brain data
-	% in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
+	in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
 	% in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-WL10TR-pc/dips_data.mat';
 	load(in_file);
 
@@ -35,7 +35,7 @@ function dipsTest(in_file)
 	opt.lambda2s = [0];
 
 	% lambda1 = 0.075 still too large
-	opt.lambda1s = [.1:.01:.2];
+	opt.lambda1s = [0.5, 0.1];
 	% opt.lambda2s = [0.1];
 
 	opt.bLinear = 0; 
@@ -49,4 +49,3 @@ function dipsTest(in_file)
 	m = dipsFold(data, opt, 1); 
 	toc(tStart)
 
-end
