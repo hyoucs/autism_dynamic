@@ -94,7 +94,7 @@ function model = dipsCoordAscent(data, options) % separate lambda1 for parfor
 	% clear W D;
 
 	% coordinate descent
-	maxIter = 500;
+	maxIter = 100;
 	optTol = 1e-5;
 
 	% keep track of coefficient vector u in each iteration

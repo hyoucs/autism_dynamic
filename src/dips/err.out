@@ -1,0 +1,11 @@
+{Error using ==
+Matrix dimensions must agree.
+
+Error in dipsFold>accuracyKmeans (line 325)
+    smodel.accuCV = sum(outlabel==testData.gnd)/sum(testIdx);
+
+
+Error in dipsFold (line 196)
+                svmModel = accuracyKmeans(dataProj, idxFold);
+
+} 
