@@ -35,8 +35,8 @@
 	opt.lambda2s = [0];
 
 	% lambda1 = 0.075 still too large
-	opt.lambda1s = [0.5, 0.1];
-	% opt.lambda2s = [0.1];
+	opt.lambda1s = [0.01:0.02:0.09,0.1:0.1:0.5];
+	opt.lambda2s = [0,0.1,0.5];
 
 	opt.bLinear = 0; 
 	opt.alpha = .2; 
