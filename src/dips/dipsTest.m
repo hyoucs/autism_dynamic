@@ -51,6 +51,6 @@
 	opt.d = 1;
 
 	tStart = tic; 
-	m = dipsFold(data, opt, 1); 
+	[m, m2] = dipsFold(data, opt, 1); 
 	toc(tStart)
 

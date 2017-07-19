@@ -1,4 +1,4 @@
-function [m] = dipsFold(data,opt,idxFold)
+function [m, m2] = dipsFold(data,opt,idxFold)
 %------------------------------------------------------------------------
 % Learning discriminant subnetwork from supervised network data
 % 2 steps:
@@ -166,6 +166,7 @@ function [m] = dipsFold(data,opt,idxFold)
     bestIdx = 1;
     bestAcc = 0.1;
     idx = 0;    % - - index for parameter combination
+    m2 = {};
     for i = 1:length(lambda1s) % - - loop all sparse parameters
         opt.lambda1 = lambda1s(i);
         
@@ -190,43 +191,28 @@ function [m] = dipsFold(data,opt,idxFold)
             % visualProj(dataProj.X, dataProj.gnd, ['testData Fold #', num2str(idxFold)]);
 
             % classify test samples with learned model
-            if opt.svm
-                svmModel = accuracySVM(dataProj, idxFold);
-            else
-                svmModel = accuracyKmeans(dataProj, idxFold);
-            end
-
-            % find best lambda1, lambda2 given limited features
-            currAcc =  mean(svmModel.accuCV);
-            if (currAcc > bestAcc) % & (cntFea<=100)
-                bestIdx = idx;
-                bestAcc = currAcc;
-            end
+            svmModel = accuracySVM(dataProj, idxFold);
+            kmsModel = accuracyKmeans(dataProj, idxFold);
 
             % export models 
-            m.accuCV(idx,1:2) = [opt.lambda1 opt.lambda2];
-            m.accuCV(idx,3:end) = svmModel.accuCV;
-            m.UAll(:,d*(idx-1)+1:d*idx ) = U;
+            m2{i}{j}.lambda1 = lambda1s(i);
+            m2{i}{j}.lambda2 = lambda2s(j);
+            m2{i}{j}.accuCV(idx,1:2) = [opt.lambda1 opt.lambda2];
+            m2{i}{j}.accuCV(idx,3) = svmModel.accuCV;
+            m2{i}{j}.accuCV(idx,4) = kmsModel.accuCV;
+            m2{i}{j}.UAll(:,d*(idx-1)+1:d*idx ) = U;
             %m.predictedLabel = svmModel.predictedLabel(:,1);
 
             if verbose
                 fprintf('%3d %6.3f %6.3f %11s %5.2f %5.2f %6.2f \n',...
                     i,lambda1s(i),lambda2s(j),num2str(cntFea),...
-                    mean(m.accuCV(idx,3:end)),std(m.accuCV(idx,3:end)),toc);
+                    mean(svmModel.accuCV(idx,3:end)), ...
+                    mean(kmsModel.accuCV(idx,3:end)), toc);
             end
 
         end
 
     end
-
-
-    % save variables to output model
-    % m.nFeaUpd = regModel.nFeaUpd;
-    m.lambda1 = m.accuCV(bestIdx,1);
-    m.lambda2 = m.accuCV(bestIdx,2);
-    m.acc = bestAcc;
-    m.theta = m.UAll(:,d*(bestIdx-1)+1:d*bestIdx);
-    m.Z = data.X*m.theta;
 
 
     % % plot proj space and selected features
