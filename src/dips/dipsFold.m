@@ -348,7 +348,7 @@ function outlabel = binaryKmeans(classCenter, testX)
     classDist = sum((testX-repmat(classCenter(1,:),nSmp,1)).^2, 2) -...
                 sum((testX-repmat(classCenter(2,:),nSmp,1)).^2, 2);
     % predict by the closest center
-    outlabel = ones(1, nDim);
+    outlabel = ones(nSmp, 1);
     outlabel(classDist > 0) = 2;
 
 end

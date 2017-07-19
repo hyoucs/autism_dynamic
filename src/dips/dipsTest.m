@@ -34,9 +34,9 @@
 	% opt.lambda1s = [1, 0.75, 0.5, logspace(2.5, 0, 9) 0]/1000;
 	% opt.lambda2s = [0];
 
-	opt.lambda1s = [0.03];
+	opt.lambda1s = [0.05];
 	% opt.lambda1s = [.01,.02,.05,.1,.2,.3,.5];
-	opt.lambda2s = [0, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1];
+	opt.lambda2s = [0];
 
 	opt.svm = false;
 	opt.bLinear = 0; 

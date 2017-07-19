@@ -71,7 +71,7 @@ function model = dipsLE(data,options,varargin)
     end
 
     % beta: similarity tradeoff (beta*Lb + (1-beta)*Aw), def.=.5
-    beta = 0.5;
+    beta = 0.8;
     if isfield(options,'beta')
         beta = options.beta;
     end
@@ -101,7 +101,7 @@ function model = dipsLE(data,options,varargin)
     end
     
     % -- generate KNN binary mask
-    if strcmp(opt.type,'Eucl')
+    if opt.distOrderAscend
         [~, idx] = sort(A,2,'ascend'); % -- sort each row in a descend order
         idx(:,[1,k+2:end]) = []; % -- remove 1st (selfnode sim) + last smallest sim
     else

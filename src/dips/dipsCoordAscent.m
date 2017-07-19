@@ -18,7 +18,7 @@ function model = dipsCoordAscent(data, options) % separate lambda1 for parfor
 %           (if nFeaUpd < 1, then it is percentage)
 %------------------------------------------------------------------------%
 
-
+	disp('...dipsCoordAscent...');
 
 
 	% - - - - - - - - - - - - - IMPORT - - - - - - - - - - - - - - - - - 
@@ -150,6 +150,6 @@ function model = dipsCoordAscent(data, options) % separate lambda1 for parfor
 	model.u = u;
 	model.u_log = u_log;
 
-
+	disp('...Exist dipsCoordAscnet...');
 
 end
