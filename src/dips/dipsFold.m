@@ -151,9 +151,6 @@ function [m, m2] = dipsFold(data,opt,idxFold)
     m.UAll = zeros(nFea, d*length(lambda1s)*length(lambda2s));
     U = zeros(nFea, d);
 
-    % accuCV store L1, L2 and nFold accracies
-    m.accuCV = zeros(length(lambda1s)*length(lambda2s),2+nFold);
-
     % dataProj: dataset in embedding space
     dataProj.gnd = data.gnd;
     dataProj.testSet = data.testSet;
@@ -206,8 +203,7 @@ function [m, m2] = dipsFold(data,opt,idxFold)
             if verbose
                 fprintf('%3d %6.3f %6.3f %11s %5.2f %5.2f %6.2f \n',...
                     i,lambda1s(i),lambda2s(j),num2str(cntFea),...
-                    mean(svmModel.accuCV(idx,3:end)), ...
-                    mean(kmsModel.accuCV(idx,3:end)), toc);
+                    svmModel.accuCV, kmsModel.accuCV, toc);
             end
 
         end
