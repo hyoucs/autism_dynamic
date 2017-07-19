@@ -71,7 +71,7 @@ function model = dipsLE(data,options,varargin)
     end
 
     % beta: similarity tradeoff (beta*Lb + (1-beta)*Aw), def.=.5
-    beta = 0.8;
+    beta = 0.5;
     if isfield(options,'beta')
         beta = options.beta;
     end
@@ -90,18 +90,19 @@ function model = dipsLE(data,options,varargin)
     % - - - - - - - - - STEP 1: COMPUTE SIMILARITY MATRIX (Kp Kn) - - - - - -
 
     %-- use Euclidean or Pearson for expression profiles
-    opt = [];
-    opt.type='Eucl';
+    if ~isfield(options, 'type')
+        options.type='Eucl';
+    end
     % opt.type='Cosine';
     if isfield(data,'A')
         A = data.A;
         data = rmfield(data,'A');
     else
-        A = pwDist(data.X',data.X',opt);
+        A = pwDist(data.X',data.X',options);
     end
     
     % -- generate KNN binary mask
-    if opt.distOrderAscend
+    if options.distOrderAscend
         [~, idx] = sort(A,2,'ascend'); % -- sort each row in a descend order
         idx(:,[1,k+2:end]) = []; % -- remove 1st (selfnode sim) + last smallest sim
     else
@@ -151,8 +152,8 @@ function model = dipsLE(data,options,varargin)
     clear An Dn;
 
     % jointly model inter-class and intra-class similarity
-    L = Ln - beta * Lp;
-    % L = beta*Ln + (1-beta)*Lp;    % alternative formulation
+    % L = Ln - beta * Lp;
+    L = beta*Ln + (1-beta)*Lp;    % alternative formulation
 
     % linear case (slower): max a'X(Lb+Aw)X'a s.t. a'XDX'a=1
     if bLinear 
