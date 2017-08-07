@@ -43,7 +43,7 @@
 
 	opt.svm = false;
 	opt.bLinear = 0; 
-	opt.beta = 0.2;
+	opt.beta = 1;
 	opt.k = 20;
 	opt.nFeaUpd = .8; 
 	opt.verbose = 1;
