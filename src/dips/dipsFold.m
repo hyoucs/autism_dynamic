@@ -17,7 +17,7 @@ function [m, m2] = dipsFold(data,opt,idxFold)
 %           .A [nSmp nSmp]:     pairwise similarity (among samples)
 %     + opt: structure
 %           .bLinear:           linear or non-linear LE (default 0-nonlinear)
-%           .alpha:             tradeoff btw Lb and Aw
+%           .beta:             tradeoff btw Lb and Aw
 %           .k:                 number of nearest neighbors
 %           .lambda1s:          set of L1 tradeoff for sparsness
 %           .lambda2s:          set of L2 tradeoff for smoothness
@@ -132,8 +132,11 @@ function [m, m2] = dipsFold(data,opt,idxFold)
         m.gnd = trainData.gnd;
         m = classCenter(m);
     end
-
-
+    
+    % plot subjects in embedding space;
+    figure;
+    gscatter(Y(:,1),Y(:,2),trainData.gnd);
+    
 
     % - - - - - - STEP 2: regression Y - - - - - - - - - - - - - - - - -
     % table column header

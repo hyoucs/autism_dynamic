@@ -10,6 +10,8 @@ function model = dipsLE(data,options,varargin)
 
 % To find discriminative subnetworks to classify network samples
 % 2 steps:
+
+
 % seek y s.t. MAX y'(Lb+Aw)y s.t. y'Dwy=1 or equivalently
 %               z'(Dw^{-.5}(Lb+Aw)Dw^{-.5})z = z'Lz s.t. z'z=1
 %  view L=XX' and decompose X=USV', similar to sparsePCA
@@ -102,11 +104,11 @@ function model = dipsLE(data,options,varargin)
     end
     
     % -- generate KNN binary mask
-    if options.distOrderAscend
-        [~, idx] = sort(A,2,'ascend'); % -- sort each row in a descend order
-        idx(:,[1,k+2:end]) = []; % -- remove 1st (selfnode sim) + last smallest sim
-    else
-        [~, idx] = sort(A,2,'descend'); % -- sort each row in a descend order
+    if options.distOrderAscend % for distance measures, the larger, the less similar
+        [~, idx] = sort(A,2,'ascend'); % -- sort each row in a ascend order, 'Eucl'
+        idx(:,[1,k+2:end]) = []; % -- remove 1st (selfnode sim) + last largest sim
+    else % for similarity measures, the larger, the more similar
+        [~, idx] = sort(A,2,'descend'); % -- sort each row in a descend order, 'Cosine'
         idx(:,[1,k+2:end]) = []; % -- remove 1st (selfnode sim) + last smallest sim
     end
     kNN = zeros(size(A));
@@ -134,7 +136,9 @@ function model = dipsLE(data,options,varargin)
     An = max(An,An');
 
     % figure;imshow(full(A),'InitialMagnification',2000);
-
+    figure; 
+    subplot(1,2,1); spy(Ap);
+    subplot(1,2,2); spy(An);
 
     % - - - - - - - - - STEP 2: COMPUTE LAPLACIAN (Lp Ln) - - - - - -
 

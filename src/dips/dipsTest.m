@@ -16,7 +16,7 @@
 	% generate pairwise distance matrix
 	opt = [];
 	opt.type = 'Cosine';
-	opt.distOrderAscend = true;
+	opt.distOrderAscend = false;
 	[pathstr,name,ext] = fileparts(in_file);
 	pw_file = [pathstr,'/dips_pwdist_',opt.type,ext];
 	if exist(pw_file,'file')
@@ -43,12 +43,11 @@
 
 	opt.svm = false;
 	opt.bLinear = 0; 
-	opt.alpha = .2; 
-	opt.beta = 0.9;
-	opt.k = 10;
+	opt.beta = 0.2;
+	opt.k = 20;
 	opt.nFeaUpd = .8; 
 	opt.verbose = 1;
-	opt.d = 1;
+	opt.d = 3;
 
 	tStart = tic; 
 	[m, m2] = dipsFold(data, opt, 1); 
