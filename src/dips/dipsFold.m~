@@ -125,22 +125,138 @@ function [m, m2] = dipsFold(data,opt,idxFold)
     % visualProj(Y, trainData.gnd, ['trainData Fold #', num2str(idxFold)]);
     [nSmp, d] = size(Y);
 
-    % if svm is suppressed, then will use kmeans instead of linear svm
+    % if svm is suppressed, then will use % function dipsTest(in_file)
+
+	%% -- DISM with brain data
+	in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
+	% in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-WL10TR-pc/dips_data.mat';
+	load(in_file);
+
+	% generate cross validation test set
+	if ~isfield(data,'testSet')
+		nFold = 10;
+		data.testSet = crossvalind('Kfold', size(data.X,1), nFold);
+		save(in_file,'data');
+	    disp('... New TestSet Generated ...');
+	end
+
+	% generate pairwise distance matrix
+	opt = [];
+	opt.type = 'Cosine';
+	opt.distOrderAscend = false;
+	[pathstr,name,ext] = fileparts(in_file);
+	pw_file = [pathstr,'/dips_pwdist_',opt.type,ext];
+	if exist(pw_file,'file')
+		disp('... loading pairwise distance matrix ...');
+		load(pw_file);
+		data.A = pw.A;
+	else
+		disp('... generate pairwise distance matrix ...');
+		pw.A = pwDist(data.X',data.X',opt);
+		save(pw_file,'pw');
+		data.A = pw.A;
+	end
+	clear pw;
+
+
+
+	disp('... run dips for cv folds ...');
+	% opt.lambda1s = [1, 0.75, 0.5, logspace(2.5, 0, 9) 0]/1000;
+	% opt.lambda2s = [0];
+
+	opt.lambda1s = [.01,.02,.03,.05,.1,.2,.3];
+	% opt.lambda1s = [.01,.02,.05,.1,.2,.3,.5];
+	% opt.lambda1s = [.01];
+	opt.lambda2s = [0,.01,.02];
+
+	opt.svm = false;
+	opt.bLinear = 1; 
+	opt.beta = 0.5;
+	opt.k = 20;
+	opt.nFeaUpd = .5; 
+	opt.verbose = 1;
+	opt.d = 3;
+
+	tStart = tic; 
+	[m, m2] = dipsFold(data, opt, 1); 
+	toc(tStart)
+
+	save('../../../autism_private/data/output.mat','m','m2','opt');
+
+kmeans instead of linear svm
     % the center of each class should be computed once you get Y in the
     % embedding space (d-dimension) limited to training samples. 
     if ~opt.svm
-        m.gnd = trainData.gnd;
+        m.gnd = trainData.gnd;% function dipsTest(in_file)
+
+	%% -- DISM with brain data
+	in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
+	% in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-WL10TR-pc/dips_data.mat';
+	load(in_file);
+
+	% generate cross validation test set
+	if ~isfield(data,'testSet')
+		nFold = 10;
+		data.testSet = crossvalind('Kfold', size(data.X,1), nFold);
+		save(in_file,'data');
+	    disp('... New TestSet Generated ...');
+	end
+
+	% generate pairwise distance matrix
+	opt = [];
+	opt.type = 'Cosine';
+	opt.distOrderAscend = false;
+	[pathstr,name,ext] = fileparts(in_file);
+	pw_file = [pathstr,'/dips_pwdist_',opt.type,ext];
+	if exist(pw_file,'file')
+		disp('... loading pairwise distance matrix ...');
+		load(pw_file);
+		data.A = pw.A;
+	else
+		disp('... generate pairwise distance matrix ...');
+		pw.A = pwDist(data.X',data.X',opt);
+		save(pw_file,'pw');
+		data.A = pw.A;
+	end
+	clear pw;
+
+
+
+	disp('... run dips for cv folds ...');
+	% opt.lambda1s = [1, 0.75, 0.5, logspace(2.5, 0, 9) 0]/1000;
+	% opt.lambda2s = [0];
+
+	opt.lambda1s = [.01,.02,.03,.05,.1,.2,.3];
+	% opt.lambda1s = [.01,.02,.05,.1,.2,.3,.5];
+	% opt.lambda1s = [.01];
+	opt.lambda2s = [0,.01,.02];
+
+	opt.svm = false;
+	opt.bLinear = 1; 
+	opt.beta = 0.5;
+	opt.k = 20;
+	opt.nFeaUpd = .5; 
+	opt.verbose = 1;
+	opt.d = 3;
+
+	tStart = tic; 
+	[m, m2] = dipsFold(data, opt, 1); 
+	toc(tStart)
+
+	save('../../../autism_private/data/output.mat','m','m2','opt');
+
+
         m = classCenter(m);
     end
     
-    % % plot subjects in embedding space;
-    % if opt.bLinear 
-    %     Xproj = data.X*Y;
-    %     figure; subplot(1,2,1); gscatter(Xproj(trainIdx,1),Xproj(trainIdx,2),trainData.gnd);
-    %     subplot(1,2,2); gscatter(Xproj(testIdx,1),Xproj(testIdx,2),testData.gnd);
-    % else
-    %     figure; gscatter(Y(:,1),Y(:,2),trainData.gnd);
-    % end
+    % plot subjects in embedding space;
+    if opt.bLinear 
+        Xproj = data.X*Y;
+        figure; subplot(1,2,1); gscatter(Xproj(trainIdx,1),Xproj(trainIdx,2),trainData.gnd);
+        subplot(1,2,2); gscatter(Xproj(testIdx,1),Xproj(testIdx,2),testData.gnd);
+    else
+        figure; gscatter(Y(:,1),Y(:,2),trainData.gnd);
+    end
 
     % figure;
     % class_idx = find(trainData.gnd == 1);

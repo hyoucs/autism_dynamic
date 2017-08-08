@@ -1,7 +1,7 @@
 function model = dipsLE(data,options,varargin)
 %------------------------------------------------------------------------%
 %-- Laplacian Embedding, both linear and non-linear projections 
-%-- Non-linear: Max u'*L*u s.t. y'*Dp*y=1  
+%-- Non-linear: Max y'*L*y s.t. y'*Dp*y=1  
 %-- Linear:     v'*X'*L*X*v s.t. v'*X'*Dp*X*v=1  (may add v'*C*v as network topo constraint)
 % 
 %-- Note: Different sizes of eigVecs y (1*nSmp) and a (1*nFea)
