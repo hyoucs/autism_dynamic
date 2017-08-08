@@ -156,8 +156,8 @@ function model = dipsLE(data,options,varargin)
     clear An Dn;
 
     % jointly model inter-class and intra-class similarity
-    % L = Ln - beta * Lp;
-    L = beta*Ln + (1-beta)*Lp;    % alternative formulation
+    L = Ln - beta * Lp;
+    % L = beta*Ln + (1-beta)*Lp;    % alternative formulation
 
     % linear case (slower): max a'X(Lb+Aw)X'a s.t. a'XDX'a=1
     if bLinear 

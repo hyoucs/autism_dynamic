@@ -39,13 +39,14 @@
 
 	opt.lambda1s = [.01,.02,.03,.05,.1,.2,.3];
 	% opt.lambda1s = [.01,.02,.05,.1,.2,.3,.5];
-	opt.lambda2s = [0];
+	% opt.lambda1s = [.01];
+	opt.lambda2s = [0,.01,.02];
 
 	opt.svm = false;
 	opt.bLinear = 0; 
-	opt.beta = 1;
-	opt.k = 20;
-	opt.nFeaUpd = .8; 
+	opt.beta = 0.5;
+	opt.k = 10;
+	opt.nFeaUpd = .5; 
 	opt.verbose = 1;
 	opt.d = 3;
 

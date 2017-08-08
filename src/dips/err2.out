@@ -1,0 +1,10 @@
+{Error using dipsLE (line 148)
+Increase kNN to ensure no disconnected same-class nodes!
+
+Error in dipsFold (line 118)
+        sModel = dipsLE(trainData, opt);
+
+} 
+{Error using save
+Variable 'm' not found.
+} 
