@@ -48,11 +48,11 @@
 	opt.k = 20;
 	opt.nFeaUpd = .8; 
 	opt.verbose = 1;
-	opt.d = 3;
+	opt.d = 2;
 
 	tStart = tic; 
 	[m, m2] = dipsFold(data, opt, 1); 
 	toc(tStart)
 
-	save('../../../autism_private/data/output.mat','m','m2','opt');
+	save('../../../autism_private/data/output2.mat','m','m2','opt');
 
