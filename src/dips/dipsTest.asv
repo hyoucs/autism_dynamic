@@ -8,11 +8,7 @@
 	% generate cross validation test set
 	if ~isfield(data,'testSet')
 		nFold = 10;
-        CVO = cvpartition(data.gnd,'Kfold',nFold);
-		data.testSet = zeros(size(data.gnd));
-        for i = 1:nFold
-            data.testSet(CVO.test(i)~=0)=i;
-        end
+		data.testSet = cvpartition(data.gnd,'Kfold',nFold);
 		save(in_file,'data');
 	    disp('... New TestSet Generated ...');
 	end
@@ -58,5 +54,5 @@
 	[m, m2] = dipsFold(data, opt, 1); 
 	toc(tStart)
 
-	save('../../../autism_private/data/output3.mat','m','m2','opt');
+	save('../../../autism_private/data/output2.mat','m','m2','opt');
 

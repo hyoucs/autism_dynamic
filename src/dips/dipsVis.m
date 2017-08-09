@@ -5,7 +5,7 @@
 data_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
 load(data_file);
 
-meta_file = '../../../autism_private/data/output.mat';
+meta_file = '../../../autism_private/data/output2.mat';
 load(meta_file);
 
 [pathstr,name,ext] = fileparts(data_file);
