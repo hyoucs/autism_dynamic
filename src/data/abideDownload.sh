@@ -4,7 +4,7 @@ subjects="./selection/abide_subjects_func_ok_dimartino_tr_2_subjects_dx_group_wi
 # subjects="selection/abide_subset_ok_subjects.csv"
 
 pipeline=cpac
-strategy=filt_global
+strategy=filt_noglobal
 derivative=rois_cc200
 ext=1D
 

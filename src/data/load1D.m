@@ -13,9 +13,10 @@ fstruct = dir([dirname, '/*.1D']);
 fnum    = length(fstruct);
 data    = {};
 
-for i = 1:fnum,
+for i = 1:fnum
 
 	% load time-series of each subject
+    disp(['reading: time-series ', fstruct(i).name]);
     d = importdata([dirname, '/', fstruct(i).name]);
     subj.data   = d.data;
     subj.name   = fstruct(i).name;

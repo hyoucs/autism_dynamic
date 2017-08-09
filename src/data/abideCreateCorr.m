@@ -42,7 +42,7 @@ function abideCreateCorr(opt)
 
 	% For each session, compute Pearson's correlation:
 	fnum = length(data);
-    for i = 1:fnum,
+    for i = 1:fnum
 
         frame       = [];
         frame.id    = data{i}.id;
@@ -57,7 +57,7 @@ function abideCreateCorr(opt)
             disp(['Subject: ', num2str(i), ' FileName:', data{i}.name]);
 
             % compute correlation matrices of each sliding window
-            for j = 1:frame_num,
+            for j = 1:frame_num
 
                 pts_beg = (j-1)*WL+1;
                 pts_end = j*WL;
