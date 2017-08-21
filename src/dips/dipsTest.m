@@ -1,8 +1,8 @@
 % function dipsTest(in_file)
 
 	%% -- DISM with brain data
-	in_file = '../../../autism_private/data/correlation/cc200-fng-wcorr-whole-session-pc/dips_data.mat';
-	% in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-WL10TR-pc/dips_data.mat';
+	% in_file = '../../../autism_private/data/correlation/cc200-fng-wcorr-whole-session-pc/dips_data.mat';
+	in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-WL10TR-pc/dips_data.mat';
 	load(in_file);
 
 	% generate cross validation test set
@@ -58,5 +58,5 @@
 	[m, m2] = dipsFold(data, opt, 2); 
 	toc(tStart)
 
-	save('../../../autism_private/data/output5.mat','m','m2','opt');
+	save('../../../autism_private/data/output.mat','m','m2','opt');
 
