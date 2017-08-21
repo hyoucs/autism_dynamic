@@ -55,7 +55,7 @@
 	opt.d = 1;
 
 	tStart = tic; 
-	[m, m2] = dipsFold(data, opt, 2); 
+	[m, m2] = dipsFold(data, opt, 5); 
 	toc(tStart)
 
 	save('../../../autism_private/data/output.mat','m','m2','opt');
