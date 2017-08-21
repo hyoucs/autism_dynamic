@@ -48,7 +48,7 @@
 	opt.lambda2s = [0];
 
 	opt.svm = false;
-	opt.bLinear = 1; 
+	opt.bLinear = 0; 
 	opt.beta = 0.5;
 	opt.k = 20;
 	opt.nFeaUpd = .8; 
