@@ -1,4 +1,4 @@
-% function dipsTest(in_file)
+function dipsTest(iFold)
 
 	%% -- DISM with brain data
 	in_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
@@ -55,12 +55,11 @@
 	opt.verbose = 1;
 	opt.d = 2;
 
+	tStart = tic; 
+	[m, m2] = dipsFold(data, opt, iFold); 
+	toc(tStart)
+	parSave(['../../../autism_private/data/nonlinear_output',num2str(iFold),'.mat'],m,m2,opt);
+	% save(['../../../autism_private/data/nonlinear_output',num2str(iFold),'.mat'],'m','m2','opt');
 
-	parpool(8);
-	parfor iFold = 3:length(unique(data.testSet))
-		tStart = tic; 
-		[m, m2] = dipsFold(data, opt, iFold); 
-		toc(tStart)
-		parSave(['../../../autism_private/data/nonlinear_output',num2str(iFold),'.mat'],m,m2,opt);
-		% save(['../../../autism_private/data/nonlinear_output',num2str(iFold),'.mat'],'m','m2','opt');
-	end
+
+end
