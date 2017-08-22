@@ -135,10 +135,10 @@ function model = dipsLE(data,options,varargin)
     Ap = max(Ap,Ap');
     An = max(An,An');
 
-    % figure;imshow(full(A),'InitialMagnification',2000);
-    figure; 
-    subplot(1,2,1); spy(Ap);
-    subplot(1,2,2); spy(An);
+    % % figure;imshow(full(A),'InitialMagnification',2000);
+    % figure; 
+    % subplot(1,2,1); spy(Ap);
+    % subplot(1,2,2); spy(An);
 
     % - - - - - - - - - STEP 2: COMPUTE LAPLACIAN (Lp Ln) - - - - - -
 
