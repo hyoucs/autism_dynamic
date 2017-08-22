@@ -55,6 +55,8 @@
 	opt.verbose = 1;
 	opt.d = 2;
 
+
+	parpool(8);
 	parfor iFold = 3:length(unique(data.testSet))
 		tStart = tic; 
 		[m, m2] = dipsFold(data, opt, iFold); 
