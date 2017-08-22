@@ -10,7 +10,7 @@
 data_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
 load(data_file);
 
-meta_file = '../../../autism_private/data/nonlinear_output.mat';
+meta_file = '../../../autism_private/data/nonlinear_output2.mat';
 load(meta_file);
 
 [pathstr,name,ext] = fileparts(data_file);
@@ -19,7 +19,7 @@ load(pw_file);
 data.A = pw.A;
 
 nFold = length(unique(data.testSet));
-idxFold = 10;
+idxFold = 2;
 
 % - - - - - - Prepare training samples and labels
 % normalized all features

@@ -55,10 +55,9 @@
 	opt.verbose = 1;
 	opt.d = 2;
 
-	parfor iFold = 3:length(unique(data.testSet))
+	for iFold = 1:length(unique(data.testSet))
 		tStart = tic; 
 		[m, m2] = dipsFold(data, opt, iFold); 
 		toc(tStart)
-		parSave(['../../../autism_private/data/nonlinear_output',num2str(iFold),'.mat'],m,m2,opt);
-		% save(['../../../autism_private/data/nonlinear_output',num2str(iFold),'.mat'],'m','m2','opt');
+		save(['../../../autism_private/data/nonlinear_output',num2str(iFold),'.mat'],'m','m2','opt');
 	end

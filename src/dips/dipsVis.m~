@@ -10,7 +10,7 @@
 data_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
 load(data_file);
 
-meta_file = '../../../autism_private/data/nolineaoutput.mat';
+meta_file = '../../../autism_private/data/nonlinear_output1.mat';
 load(meta_file);
 
 [pathstr,name,ext] = fileparts(data_file);
@@ -19,7 +19,7 @@ load(pw_file);
 data.A = pw.A;
 
 nFold = length(unique(data.testSet));
-idxFold = 1;
+idxFold = 10;
 
 % - - - - - - Prepare training samples and labels
 % normalized all features
@@ -51,7 +51,7 @@ for idxl1 = 1:size(m2,1)
 		
 		figure; 
 		subplot(1,2,1); 
-		gscatter(m.Y(:,1),m.Y(:,2),trainData.gnd);
+		gscatter(m.Y(:,1),m.Y(:,2),trainData.gnd');
 		title('embeded');
 		subplot(1,2,2);
 		gscatter(Xproj(trainIdx,1),Xproj(trainIdx,2),trainData.gnd);
