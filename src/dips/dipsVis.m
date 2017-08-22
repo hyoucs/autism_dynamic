@@ -74,8 +74,14 @@ end
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 % - - - - - - Load data
-data_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_linear_eig.mat';
-load(data_file);
+data_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_data.mat';
+load(data_file);	% data
+
+eigs_file = '../../../autism_private/data/correlation/cc200-fg-wcorr-whole-session-pc/dips_linear_eig.mat';
+load(eigs_file);	% x, d
+
+meta_file = '../../../autism_private/data/meta/linear_opt.mat';
+load(meta_file);	% opt
 
 [pathstr,name,ext] = fileparts(data_file);
 pw_file = [pathstr,'/dips_pwdist_',opt.type,ext];
@@ -109,24 +115,14 @@ fine_gnd = zeros(size(data.gnd));
 fine_gnd(tr_1) = 1; fine_gnd(tr_2) = 2;
 fine_gnd(te_1) = 3; fine_gnd(te_2) = 4;
 
-for idxl1 = 1:size(m2,1)
-	for idxl2 = 1:size(m2,2)
-		Xproj = data.X*m2{idxl1}{idxl2}.UAll;
-		
-		figure; 
-		subplot(1,2,1); 
-		gscatter(m.Y(:,1),m.Y(:,2),trainData.gnd);
-		title('embeded');
-		subplot(1,2,2);
-		gscatter(Xproj(trainIdx,1),Xproj(trainIdx,2),trainData.gnd);
-		title('approximated');
 
-		figure; 
-		subplot(1,2,1);
-		gscatter(Xproj(trainIdx,1),Xproj(trainIdx,2),trainData.gnd);
-		title('train approximated');
-		subplot(1,2,2);
-		gscatter(Xproj(:,1),Xproj(:,2),fine_gnd);
-		title('test approximated');		
-	end
-end
+Xproj = data.X*d(:,1:2);
+
+figure; 
+subplot(1,2,1);
+gscatter(Xproj(trainIdx,1),Xproj(trainIdx,2),trainData.gnd);
+title('train approximated');
+subplot(1,2,2);
+gscatter(Xproj(:,1),Xproj(:,2),fine_gnd);
+title('test approximated');		
+
