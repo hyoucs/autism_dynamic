@@ -48,16 +48,16 @@
 	opt.lambda2s = [0];
 
 	opt.svm = false;
-	opt.bLinear = 1; 
+	opt.bLinear = 0; 
 	opt.beta = 0.5;
 	opt.k = 20;
 	opt.nFeaUpd = .8; 
 	opt.verbose = 1;
-	opt.d = 1;
+	opt.d = 2;
 
 	for iFold = 1:length(unique(data.testSet)),
 		tStart = tic; 
 		[m, m2] = dipsFold(data, opt, iFold); 
 		toc(tStart)
-		save('../../../autism_private/data/nonlinear_output.mat','m','m2','opt');
+		save(['../../../autism_private/data/nonlinear_output',num2str(iFold),'.mat'],'m','m2','opt');
 	end
