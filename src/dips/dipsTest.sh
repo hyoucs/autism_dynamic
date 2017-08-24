@@ -2,7 +2,7 @@
 
 j=0
 nb_concurrent_processes=10
-for idxFold in {5..10}
+for idxFold in {1..10}
 do
 
 	echo "    ====== START: DIPS cv fold: ${idxFold} ======"

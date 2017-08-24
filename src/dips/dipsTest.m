@@ -53,7 +53,7 @@ function dipsTest(iFold)
 	opt.k = 20;
 	opt.nFeaUpd = .8; 
 	opt.verbose = 1;
-	opt.d = 2;
+	opt.d = 5;
 
 	tStart = tic; 
 	[m, m2] = dipsFold(data, opt, iFold); 
